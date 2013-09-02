@@ -19,7 +19,7 @@ public class EsperEngine extends Thread {
 
 		//<Creating a Statement>
 		EPServiceProvider epService = EPServiceProviderManager.getDefaultProvider(config);
-		String epl = "select ipAddress, uuid, responseTime, url from PageCallEvent.win:time(300 sec) where responseTime > 100";
+		String epl = "SELECT ipAddress, uuid, avg(responseTime), url from PageCallEvent.win:time_batch (5 sec) GROUP BY url HAVING avg(responseTime)>1  ";
 		EPStatement statement = epService.getEPAdministrator().createEPL(epl);
 
 		//<Adding a Listener>
@@ -27,7 +27,7 @@ public class EsperEngine extends Thread {
 		statement.addListener(listener);
 		//</Adding a Listener>
 
-		TDeserializer deserializer = new TDeserializer(new TBinaryProtocol.Factory());
+		TDeserializer deserializer = new TDeserializer(new TBinaryProtocol.Factory());  
 
 		ZMQ.Context context = ZMQ.context(1);
 		ZMQ.Socket subscriber = context.socket(ZMQ.SUB);
