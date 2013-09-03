@@ -11,14 +11,13 @@ public class MyListener implements UpdateListener {
            
         //System.out.println(event.get("IP_Address"));
         try {
+        	
         	FileWriter fw = new FileWriter("AlarmLog.txt",true);
         	BufferedWriter bw = new BufferedWriter(fw);
-        	//bw.write((String) event.get("ipAddress") + ", " + (Long) event.get("responseTime") + ", "+ (String) event.get("uuid")+ "," + (String) event.get("url")+"\n");
-        	bw.write((String) event.getUnderlying()); 
+        	bw.write((String) event.get("ipAddress") + ", " + (Long) event.get("responseTime") + ", "+ (String) event.get("uuid")+ "," + (String) event.get("url")+"\n");
         	bw.close();
         	fw.close();
-        	System.out.println("EPL STARTED!");
-        	System.out.println("average response time is " + (String) event.getUnderlying());
+        	      	
         	
         }catch (IOException e) {
             System.err.println(e); // 에러가 있다면 메시지 출력

@@ -19,8 +19,10 @@ public class EsperEngine extends Thread {
 
 		//<Creating a Statement>
 		EPServiceProvider epService = EPServiceProviderManager.getDefaultProvider(config);
-		String epl = "SELECT ipAddress, uuid, avg(responseTime), url from PageCallEvent.win:time_batch (5 sec) GROUP BY url HAVING avg(responseTime)>1  ";
+		//String epl = "SELECT ipAddress, uuid, avg(responseTime), url from PageCallEvent.win:time_batch (5 sec) GROUP BY url HAVING avg(responseTime)>1  ";
+		String epl = "SELECT ipAddress, uuid, responseTime, url from PageCallEvent.win:time_batch (5 sec) ";
 		EPStatement statement = epService.getEPAdministrator().createEPL(epl);
+		
 
 		//<Adding a Listener>
 		MyListener listener = new MyListener();
