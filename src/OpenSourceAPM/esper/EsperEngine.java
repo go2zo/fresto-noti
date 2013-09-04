@@ -20,15 +20,23 @@ public class EsperEngine extends Thread {
 		//<Creating a Statement>
 		EPServiceProvider epService = EPServiceProviderManager.getDefaultProvider(config);
 		//String epl = "SELECT ipAddress, uuid, avg(responseTime), url from PageCallEvent.win:time_batch (5 sec) GROUP BY url HAVING avg(responseTime)>1  ";
-		String epl = "SELECT ipAddress, uuid, responseTime, url from PageCallEvent.win:time_batch (5 sec) ";
+		//String epl = "SELECT ipAddress, uuid, responseTime, url from PageCallEvent.win:time_batch (5 sec) GROUP BY url";
+		String epl = "SELECT avg(responseTime), url from PageCallEvent.win:time_batch (30 sec) GROUP BY url HAVING avg(responseTime) > 50";
 		EPStatement statement = epService.getEPAdministrator().createEPL(epl);
 		
 
 		//<Adding a Listener>
-		MyListener listener = new MyListener();
-		statement.addListener(listener);
+		//MyListener listener = new MyListener();
+		//statement.addListener(listener);
 		//</Adding a Listener>
-
+		
+		//<Set Subscriber>
+		MyNotiSubscriber notiSubscriber = new MyNotiSubscriber();
+		statement.setSubscriber(notiSubscriber);
+		//</Adding a Subscriber>
+		
+		
+		//HJ
 		TDeserializer deserializer = new TDeserializer(new TBinaryProtocol.Factory());  
 
 		ZMQ.Context context = ZMQ.context(1);
@@ -53,8 +61,16 @@ public class EsperEngine extends Thread {
 				System.out.println("Event.timestamp : " + event.getTimestamp());
 				System.out.println("Event.elaspedTime : " + event.getElapsedTime());
 
-				PageCallEvent event1 = new PageCallEvent(event.getClientId(),event.getUuid(),event.getElapsedTime(),event.getUrl());
-				epService.getEPRuntime().sendEvent(event1);
+				//PageCallEvent event1 = new PageCallEvent(event.getClientId(),event.getUuid(),event.getElapsedTime(),event.getUrl());
+				//epService.getEPRuntime().sendEvent(event1);
+				
+				//
+				if(event.getStage().equals("afterCall")){
+					PageCallEvent event1 = new PageCallEvent(event.getClientId(),event.getUuid(),event.getElapsedTime(),event.getUrl());
+					epService.getEPRuntime().sendEvent(event1);
+				}
+				
+
 
 			} catch(TException te) {
 				te.printStackTrace();
