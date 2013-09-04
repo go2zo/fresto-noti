@@ -6,7 +6,7 @@ import java.io.IOException;
 
 import java.util.Calendar;
 
-public class MyNotiSubscriber {
+public class MyNotiSubscriber1 {
 	
 		//public void update(String IP_Address, String UUID, long ResponseTime, String URL){
 		  public void update(double ResponseTime, String URL){	
@@ -18,7 +18,7 @@ public class MyNotiSubscriber {
 				                             cal.get(Calendar.HOUR_OF_DAY),cal.get(Calendar.MINUTE),cal.get(Calendar.SECOND));
 				 	//</Date-Time>
 	 			 
-		        	FileWriter fw = new FileWriter("AlarmLog2.txt",true);
+		        	FileWriter fw = new FileWriter("AlarmLog1.txt",true);
 		        	BufferedWriter bw = new BufferedWriter(fw);
 		        	//bw.write(IP_Address + " " + UUID + " " + Long.toString(ResponseTime) + " " + URL + " " + s + "\n");
 		        	bw.write(Double.toString(ResponseTime) + " " + URL + " " + s + "\n");

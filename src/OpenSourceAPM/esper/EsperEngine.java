@@ -21,8 +21,11 @@ public class EsperEngine extends Thread {
 		EPServiceProvider epService = EPServiceProviderManager.getDefaultProvider(config);
 		//String epl = "SELECT ipAddress, uuid, avg(responseTime), url from PageCallEvent.win:time_batch (5 sec) GROUP BY url HAVING avg(responseTime)>1  ";
 		//String epl = "SELECT ipAddress, uuid, responseTime, url from PageCallEvent.win:time_batch (5 sec) GROUP BY url";
-		String epl = "SELECT avg(responseTime), url from PageCallEvent.win:time_batch (30 sec) GROUP BY url HAVING avg(responseTime) > 50";
-		EPStatement statement = epService.getEPAdministrator().createEPL(epl);
+		String epl1 = "SELECT avg(responseTime), url from PageCallEvent.win:time_batch (30 sec) GROUP BY url HAVING avg(responseTime) > 100";
+		EPStatement statement1 = epService.getEPAdministrator().createEPL(epl1);
+		
+		String epl2 = "SELECT url, count(*) from PageCallEvent.win:time_batch (10 sec) GROUP BY url HAVING count(*) > 5";
+		EPStatement statement2 = epService.getEPAdministrator().createEPL(epl2);
 		
 
 		//<Adding a Listener>
@@ -31,8 +34,14 @@ public class EsperEngine extends Thread {
 		//</Adding a Listener>
 		
 		//<Set Subscriber>
-		MyNotiSubscriber notiSubscriber = new MyNotiSubscriber();
-		statement.setSubscriber(notiSubscriber);
+		MyNotiSubscriber1 notiSubscriber1 = new MyNotiSubscriber1();
+		statement1.setSubscriber(notiSubscriber1);
+		
+		MyNotiSubscriber2 notiSubscriber2 = new MyNotiSubscriber2();
+		statement2.setSubscriber(notiSubscriber2);
+		
+		
+		
 		//</Adding a Subscriber>
 		
 		
