@@ -1,0 +1,7 @@
+218.38.70.197, 0, E7DF2C60-89F0-432B-8C6A-ABDD41E4C5D4,http://beta.owlab.com:8080/jpetstoreL/shop/index.do
+218.38.70.197, 0, 595C760F-3D34-4AE5-96C9-574EAB6A4A03,http://beta.owlab.com:8080/jpetstoreL/shop/index.do
+14.39.190.154, 0, 1C66FAB2-4A0D-471F-A7C4-64E1BCB3B3E7,http://www.springframework.org/
+14.39.190.154, 0, A9D06ACD-F745-4447-AEB8-C546D318FA8F,http://www.springframework.org/
+218.38.70.197, 0, 426389BC-1925-4F95-BD0C-9D47ECB4DAD2,http://beta.owlab.com:8080/jpetstoreL/shop/index.do
+218.38.70.197, 4460, 426389BC-1925-4F95-BD0C-9D47ECB4DAD2,http://beta.owlab.com:8080/jpetstoreL/shop/index.do
+14.39.190.154, 0, FA62ECEB-123B-4A15-9E66-1188310B2354,file://localhost/F:/apm/fresto-aum/jpetstoreL/web/shop/signonForm.do

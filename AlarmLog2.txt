@@ -1,0 +1,6 @@
+82.53333333333333 http://beta.owlab.com:8080/jpetstoreL/shop/index.do 2013-09-04 14:51:11
+112.66666666666667 http://beta.owlab.com:8080/jpetstoreL/shop/viewCategory.do?categoryId=REPTILES 2013-09-04 14:51:11
+95.5 http://beta.owlab.com:8080/jpetstoreL/shop/viewCategory.do?categoryId=BIRDS 2013-09-04 14:51:11
+96.66666666666667 http://beta.owlab.com:8080/jpetstoreL/shop/viewCategory.do?categoryId=CATS 2013-09-04 14:51:11
+87.33333333333333 http://beta.owlab.com:8080/jpetstoreL/shop/viewCategory.do?categoryId=DOGS 2013-09-04 14:51:11
+87.66666666666667 http://beta.owlab.com:8080/jpetstoreL/shop/viewCategory.do?categoryId=FISH 2013-09-04 14:51:11
