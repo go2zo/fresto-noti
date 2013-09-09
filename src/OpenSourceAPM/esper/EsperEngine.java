@@ -19,8 +19,7 @@ public class EsperEngine extends Thread {
 
 		//<Creating a Statement>
 		EPServiceProvider epService = EPServiceProviderManager.getDefaultProvider(config);
-		//String epl = "SELECT ipAddress, uuid, avg(responseTime), url from PageCallEvent.win:time_batch (5 sec) GROUP BY url HAVING avg(responseTime)>1  ";
-		//String epl = "SELECT ipAddress, uuid, responseTime, url from PageCallEvent.win:time_batch (5 sec) GROUP BY url";
+		
 		String epl1 = "SELECT avg(responseTime), url from PageCallEvent.win:time_batch (30 sec) GROUP BY url HAVING avg(responseTime) > 100";
 		EPStatement statement1 = epService.getEPAdministrator().createEPL(epl1);
 		
@@ -39,9 +38,7 @@ public class EsperEngine extends Thread {
 		
 		MyNotiSubscriber2 notiSubscriber2 = new MyNotiSubscriber2();
 		statement2.setSubscriber(notiSubscriber2);
-		
-		
-		
+				
 		//</Adding a Subscriber>
 		
 		
@@ -70,9 +67,7 @@ public class EsperEngine extends Thread {
 				System.out.println("Event.timestamp : " + event.getTimestamp());
 				System.out.println("Event.elaspedTime : " + event.getElapsedTime());
 
-				//PageCallEvent event1 = new PageCallEvent(event.getClientId(),event.getUuid(),event.getElapsedTime(),event.getUrl());
-				//epService.getEPRuntime().sendEvent(event1);
-				
+								
 				//
 				if(event.getStage().equals("afterCall")){
 					PageCallEvent event1 = new PageCallEvent(event.getClientId(),event.getUuid(),event.getElapsedTime(),event.getUrl());

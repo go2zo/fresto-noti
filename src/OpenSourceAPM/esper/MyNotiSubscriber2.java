@@ -5,6 +5,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Calendar;
 
+import java.util.Properties;
+
 public class MyNotiSubscriber2 {
 	//public void update(String IP_Address, String UUID, long ResponseTime, String URL){
 	  public void update(String URL, long count){	
@@ -18,7 +20,6 @@ public class MyNotiSubscriber2 {
 			 
 	        	FileWriter fw = new FileWriter("AlarmLog2.txt",true);
 	        	BufferedWriter bw = new BufferedWriter(fw);
-	        	//bw.write(IP_Address + " " + UUID + " " + Long.toString(ResponseTime) + " " + URL + " " + s + "\n");
 	        	bw.write(URL + " " + Long.toString(count) + " " + s + "\n");
 	        	bw.close();
 	        	fw.close();        	      			        	
@@ -26,6 +27,26 @@ public class MyNotiSubscriber2 {
 	            System.err.println(e); // 에러가 있다면 메시지 출력
 	            System.exit(1);
 	        }
+		 
+		 //<Send a Mail>>
+		 Properties gmailProps = new Properties();
+		 gmailProps.put("mail.smtp.starttls.enable","true");
+		 gmailProps.put("mail.smtp.host", "smtp.gmail.com");
+		 gmailProps.put("mail.smtp.auth", "true");
+		 gmailProps.put("mail.smtp.host", "587");
+		 
+		 String from = "jaeyoungjeon@gmail.com";
+	     // 보내는이 메일주소
+	     String to = "jyeong.jeon@gmail.com,";
+	     // 받는이 이메일 주소는 반드시 ","로 구분해준다. String to = "받을 이메일 주소1,받을 이메일 주소2";
+	     String subject = "이메일 발송 테스트";
+	     String content = "안녕하세요 Java Email 발송 테스트입니다.";
+	         
+	     MailSender emailSender = new MailSender(gmailProps);
+	     //EmailSender emailSender = new EmailSender(jamesProps);
+	     emailSender.sendMail(from, to, subject, content);
+		 
+		 //</Send a Mail>
 	}
 
 }
