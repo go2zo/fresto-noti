@@ -33,11 +33,11 @@ public class MyNotiSubscriber2 {
 		 gmailProps.put("mail.smtp.starttls.enable","true");
 		 gmailProps.put("mail.smtp.host", "smtp.gmail.com");
 		 gmailProps.put("mail.smtp.auth", "true");
-		 gmailProps.put("mail.smtp.host", "587");
+		 gmailProps.put("mail.smtp.port", "465");
 		 
 		 String from = "jaeyoungjeon@gmail.com";
 	     // 보내는이 메일주소
-	     String to = "jyeong.jeon@gmail.com,";
+	     String to = "jyeong.jeon@gmail.com";
 	     // 받는이 이메일 주소는 반드시 ","로 구분해준다. String to = "받을 이메일 주소1,받을 이메일 주소2";
 	     String subject = "이메일 발송 테스트";
 	     String content = "안녕하세요 Java Email 발송 테스트입니다.";
@@ -47,6 +47,7 @@ public class MyNotiSubscriber2 {
 	     emailSender.sendMail(from, to, subject, content);
 		 
 		 //</Send a Mail>
+	     System.out.println("Mail Sent !");
 	}
 
 }
