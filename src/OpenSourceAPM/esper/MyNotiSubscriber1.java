@@ -8,7 +8,7 @@ import java.util.Calendar;
 
 public class MyNotiSubscriber1 {
 	
-		//public void update(String IP_Address, String UUID, long ResponseTime, String URL){
+		
 		  public void update(double ResponseTime, String URL){	
 			 try {	
 				 
@@ -28,6 +28,18 @@ public class MyNotiSubscriber1 {
 		            System.err.println(e); // 에러가 있다면 메시지 출력
 		            System.exit(1);
 		        }
+			 
+			 String to = "jyeong.jeon@gmail.com";
+			 //String to = "hunjae.lee@gmail.com";
+		     // 받는이 이메일 주소는 반드시 ","로 구분해준다. String to = "받을 이메일 주소1,받을 이메일 주소2";
+		     String subject = "Alarm 1 이벤트가 발생하였습니다 !";
+		     String content = "Alarm 1 이벤트가 발생하였습니다.!" + "\n" + "최근 30초간 평균 100 ms 이상의 응답시간이 소요된 호출이 발생되었습니다." + "\n" + "로그를 확인하세요.";
+		         
+		     GMailSender mailSender = new GMailSender();
+		     mailSender.sendMail(to, subject, content);
+			 
+					 
+			 
 		}
 
 }

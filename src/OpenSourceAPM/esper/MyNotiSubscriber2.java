@@ -8,7 +8,7 @@ import java.util.Calendar;
 import java.util.Properties;
 
 public class MyNotiSubscriber2 {
-	//public void update(String IP_Address, String UUID, long ResponseTime, String URL){
+	
 	  public void update(String URL, long count){	
 		 try {	
 			 
@@ -28,26 +28,16 @@ public class MyNotiSubscriber2 {
 	            System.exit(1);
 	        }
 		 
-		 //<Send a Mail>>
-		 Properties gmailProps = new Properties();
-		 gmailProps.put("mail.smtp.starttls.enable","true");
-		 gmailProps.put("mail.smtp.host", "smtp.gmail.com");
-		 gmailProps.put("mail.smtp.auth", "true");
-		 gmailProps.put("mail.smtp.port", "465");
-		 
-		 String from = "jaeyoungjeon@gmail.com";
-	     // 보내는이 메일주소
-	     String to = "jyeong.jeon@gmail.com";
+		
+	     //String to = "jyeong.jeon@gmail.com";
+		 String to = "hunjae.lee@gmail.com";
 	     // 받는이 이메일 주소는 반드시 ","로 구분해준다. String to = "받을 이메일 주소1,받을 이메일 주소2";
-	     String subject = "이메일 발송 테스트";
-	     String content = "안녕하세요 Java Email 발송 테스트입니다.";
+	     String subject = "Alarm 2 이벤트가 발생하였습니다 !";
+	     String content = "Alarm 2 이벤트가 발생하였습니다.!" + "\n" + "10초간 5회 이상의 호출이 발생되었습니다." + "\n" + "로그를 확인하세요.";
 	         
-	     MailSender emailSender = new MailSender(gmailProps);
-	     //EmailSender emailSender = new EmailSender(jamesProps);
-	     emailSender.sendMail(from, to, subject, content);
-		 
-		 //</Send a Mail>
-	     System.out.println("Mail Sent !");
+	     GMailSender mailSender = new GMailSender();
+	     mailSender.sendMail(to, subject, content);
+	
 	}
 
 }

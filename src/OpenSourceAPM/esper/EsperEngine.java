@@ -27,11 +27,7 @@ public class EsperEngine extends Thread {
 		EPStatement statement2 = epService.getEPAdministrator().createEPL(epl2);
 		
 
-		//<Adding a Listener>
-		//MyListener listener = new MyListener();
-		//statement.addListener(listener);
-		//</Adding a Listener>
-		
+				
 		//<Set Subscriber>
 		MyNotiSubscriber1 notiSubscriber1 = new MyNotiSubscriber1();
 		statement1.setSubscriber(notiSubscriber1);
