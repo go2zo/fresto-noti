@@ -1,5 +1,7 @@
 package OpenSourceAPM.esper;
 
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.thrift.TDeserializer;
 import org.apache.thrift.TException;
 import org.apache.thrift.protocol.TBinaryProtocol;
@@ -12,15 +14,25 @@ import com.espertech.esper.client.EPStatement;
 
 public class EsperEngine extends Thread {
 	public static void main(String[] args) {
+		
+		PropertiesConfiguration props = null;
+		try {
+			props = new PropertiesConfiguration("engine.properties");
+		} catch (ConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		//<Setting a configuration>
 		Configuration config = new Configuration();
-		config.addEventTypeAutoName("OpenSourceAPM.esper");
+		config.addEventTypeAutoName(props.getString("package"));
+//		config.addEventTypeAutoName("OpenSourceAPM.esper");
 		//</Setting a configuration>
 
 		//<Creating a Statement>
 		EPServiceProvider epService = EPServiceProviderManager.getDefaultProvider(config);
 		
-		String epl1 = "SELECT avg(responseTime), url from PageCallEvent.win:time_batch (30 sec) GROUP BY url HAVING avg(responseTime) > 100";
+		String epl1 = "";
 		EPStatement statement1 = epService.getEPAdministrator().createEPL(epl1);
 		
 		String epl2 = "SELECT url, count(*) from PageCallEvent.win:time_batch (10 sec) GROUP BY url HAVING count(*) > 5";
@@ -43,29 +55,32 @@ public class EsperEngine extends Thread {
 
 		ZMQ.Context context = ZMQ.context(1);
 		ZMQ.Socket subscriber = context.socket(ZMQ.SUB);
-		subscriber.connect("tcp://fresto1.owlab.com:7001");
+		
+		String addr = props.getString("server");
+		subscriber.connect(addr);
+//		subscriber.connect("tcp://fresto1.owlab.com:7001");
 		//subscriber.subscribe("A".getBytes());
-		subscriber.subscribe("U".getBytes());
+		subscriber.subscribe("U".getBytes()); //$NON-NLS-1$
 
 		while(true) {
-			System.out.println("Waiting...");
+			System.out.println("Waiting..."); //$NON-NLS-1$
 			String envelope = new String(subscriber.recv(0));
 			byte[] messageBytes = subscriber.recv(0);
 			try {
 				UIEvent event = new UIEvent();
 				deserializer.deserialize(event, messageBytes);
-				System.out.println("Message Envelope: " + envelope);
-				System.out.println("Event.stage : " + event.getStage());
-				System.out.println("Event.clientId : " + event.getClientId());
-				System.out.println("Event.currentPage : " + event.getCurrentPlace());
-				System.out.println("Event.uuid : " + event.getUuid());
-				System.out.println("Event.url : " + event.getUrl());
-				System.out.println("Event.timestamp : " + event.getTimestamp());
-				System.out.println("Event.elaspedTime : " + event.getElapsedTime());
+				System.out.println("Message Envelope: " + envelope); //$NON-NLS-1$
+				System.out.println("Event.stage : " + event.getStage()); //$NON-NLS-1$
+				System.out.println("Event.clientId : " + event.getClientId()); //$NON-NLS-1$
+				System.out.println("Event.currentPage : " + event.getCurrentPlace()); //$NON-NLS-1$
+				System.out.println("Event.uuid : " + event.getUuid()); //$NON-NLS-1$
+				System.out.println("Event.url : " + event.getUrl()); //$NON-NLS-1$
+				System.out.println("Event.timestamp : " + event.getTimestamp()); //$NON-NLS-1$
+				System.out.println("Event.elaspedTime : " + event.getElapsedTime()); //$NON-NLS-1$
 
 								
 				//
-				if(event.getStage().equals("afterCall")){
+				if(event.getStage().equals("afterCall")){ //$NON-NLS-1$
 					PageCallEvent event1 = new PageCallEvent(event.getClientId(),event.getUuid(),event.getElapsedTime(),event.getUrl());
 					epService.getEPRuntime().sendEvent(event1);
 				}

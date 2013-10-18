@@ -1,6 +1,9 @@
 package OpenSourceAPM.esper;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.util.Properties;
+
 import javax.mail.Authenticator;
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -11,26 +14,16 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeUtility;
 
 public class GMailSender {
-	String host = "smtp.gmail.com";
-	//String subject = "Event 발생 공지";
 	String from = "noti.opensourceapm@gmail.com";
 	String fromName = "OpensourceAPM";
-	//String to = "jaeyoungjeon@gmail.com";
-	//String content = "Event 가 발생햇습니다. 로그를 확인해주세요 !";
 	
 	public void sendMail(String to, String subject, String content){
 	
 	try{
 		Properties props = new Properties();
+		props.load(new FileInputStream(new File("gmail.properties")));
 		
-		props.put("mail.smtp.starttls.enable","true");
-        props.put("mail.transport.protocol", "smtp");
-        props.put("mail.smtp.host", host);
-        props.setProperty("mail.smtp.socketFactory.class","javax.net.ssl.SSLSocketFactory");
-        props.put("mail.smtp.port", "465");
-        props.put("mail.smtp.auth", "true");
-        
-        MyAuthenticator auth = new MyAuthenticator("noti.opensourceapm@gmail.com","zaq12wsx!");
+        MyAuthenticator auth = new MyAuthenticator(from,"zaq12wsx!");
         
         Session mailSession	= Session.getDefaultInstance(props, auth);
         
