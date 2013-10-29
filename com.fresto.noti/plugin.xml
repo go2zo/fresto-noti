@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension-point id="subscribers" name="Subscribers" schema="schema/subscribers.exsd"/>
+   <extension
+         point="com.fresto.noti.subscribers">
+      <subscriber
+            class="com.fresto.noti.mail.MailSubscriber"
+            epl="epl"
+            id="com.fresto.noti.subscriber1">
+      </subscriber>
+   </extension>
+
+</plugin>
