@@ -32,7 +32,7 @@ public class EsperEngine extends Thread {
 		//<Creating a Statement>
 		EPServiceProvider epService = EPServiceProviderManager.getDefaultProvider(config);
 		
-		String epl1 = "";
+		String epl1 = "SELECT avg(responseTime), url from PageCallEvent.win:time_batch (30 sec) GROUP BY url HAVING avg(responseTime) > 100";
 		EPStatement statement1 = epService.getEPAdministrator().createEPL(epl1);
 		
 		String epl2 = "SELECT url, count(*) from PageCallEvent.win:time_batch (10 sec) GROUP BY url HAVING count(*) > 5";

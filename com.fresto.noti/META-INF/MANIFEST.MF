@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Noti
-Bundle-SymbolicName: com.fresto.noti;singleton:=true
+Bundle-SymbolicName: com.fresto.noti
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: com.fresto.noti.Activator
 Bundle-Vendor: FRESTO
