@@ -17,8 +17,8 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeUtility;
 
-public class GmailSender {
-
+public class GMailSender {
+	
 	public void sendMail(String address, String password, String personal,
 			String recipients, String subject, String content){
 

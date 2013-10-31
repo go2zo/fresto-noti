@@ -5,4 +5,5 @@ public class JavascriptSubscriber {
 	public void update(Object[] row) {
 		
 	}
+	
 }

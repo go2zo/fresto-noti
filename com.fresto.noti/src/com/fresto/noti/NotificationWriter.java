@@ -119,7 +119,6 @@ public class NotificationWriter extends Thread {
 			FrestoData frestoData = new FrestoData();
 			deserializer.deserialize(frestoData, eventBytes);
 			
-			logger.info("Event topic: " + topic);
 			NotificationService.getInstance().sendEvent(frestoData);
 		} else {
 			logger.warn("Event topic: " + topic + " not recognized. Possible valures: " + TOPIC_NOTIFICATION); 
