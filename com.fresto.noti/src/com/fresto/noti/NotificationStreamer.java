@@ -1,27 +1,26 @@
 package com.fresto.noti;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.zeromq.ZMQ;
-import org.zeromq.ZMQ.Context;
-import org.zeromq.ZMQ.Socket;
 
-public class NotificationStreamer {
+public class NotificationStreamer extends Thread {
 	
-	private Logger logger = Logger.getLogger(getClass().getName());
+	private static Logger logger = LoggerFactory.getLogger(NotificationStreamer.class);
 	
 	private static int frontport = 7011;
 	private static int backport = 7012;
 	
 	public void run() {
 		//  Prepare our context and sockets
-		Context context = ZMQ.context(1);
+		ZMQ.Context context = ZMQ.context(1);
 
 		//  This is where the weather server sits
-		Socket frontend =  context.socket(ZMQ.SUB);
+		ZMQ.Socket frontend =  context.socket(ZMQ.SUB);
 		frontend.connect("tcp://*:" + frontport);
 
 		//  This is our public endpoint for subscribers
-		Socket backend  = context.socket(ZMQ.PUSH);
+		ZMQ.Socket backend  = context.socket(ZMQ.PUSH);
 		backend.bind("tcp://*:" + backport);
 
 		logger.info("Starting Streamer with " + frontport + "/" + backport);
@@ -35,10 +34,6 @@ public class NotificationStreamer {
 		frontend.close();
 		backend.close();
 		context.term();
-	}
-	
-	public static void main (String[] args) {
-		new NotificationStreamer().run();
 	}
 
 }

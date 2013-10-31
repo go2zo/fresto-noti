@@ -11,12 +11,16 @@ import org.zeromq.ZMQException;
 
 public class FrestoEventQueue extends Thread {
 
-	Logger logger = Logger.getLogger(getClass().getName());
+	private Logger logger = Logger.getLogger(getClass().getName());
 
 	private Queue<FrestoEvent> queue = new ConcurrentLinkedQueue<>();
 	private AtomicBoolean work = new AtomicBoolean(true);
 	private ZMQ.Socket receiveSocket;
 
+	public FrestoEventQueue() {
+		
+	}
+	
 	public FrestoEventQueue(ZMQ.Socket receiveSocket) {
 		this.receiveSocket = receiveSocket;
 	}
@@ -33,7 +37,6 @@ public class FrestoEventQueue extends Thread {
 			try {
 				String topic = new String(receiveSocket.recv(0)); 
 				byte[] eventBytes = receiveSocket.recv(0);
-				
 				FrestoEvent frestoEvent = new FrestoEvent(topic, eventBytes);
 				queue.add(frestoEvent);
 			} catch(ZMQException e) {
@@ -49,6 +52,7 @@ public class FrestoEventQueue extends Thread {
 	public void setPullerSocket(ZMQ.Socket receiveSocket) {
 		this.receiveSocket = receiveSocket;
 	}
+	
 	public void stopWork() {
 		this.work.set(false);
 	}
@@ -58,7 +62,7 @@ public class FrestoEventQueue extends Thread {
 	}
 
 	public FrestoEvent poll() {
-		return this.queue.poll();
+		return queue.poll();
 	}
 
 	public Iterator<FrestoEvent> getIterator() {
