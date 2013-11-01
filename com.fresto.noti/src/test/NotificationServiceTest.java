@@ -3,6 +3,7 @@ package test;
 import org.apache.thrift.TException;
 import org.apache.thrift.TSerializer;
 import org.apache.thrift.protocol.TBinaryProtocol;
+import org.junit.Test;
 import org.zeromq.ZMQ;
 
 import fresto.data.ClientID;
@@ -14,7 +15,8 @@ import fresto.data.ResponseEdge;
 
 public class NotificationServiceTest {
 
-	public static void main(String[] args) {
+	@Test
+	public void testFrestoDataSend() {
 		TSerializer serializer = new TSerializer(new TBinaryProtocol.Factory());
 
 		ZMQ.Context context = ZMQ.context(1);

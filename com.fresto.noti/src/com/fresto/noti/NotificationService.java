@@ -1,3 +1,14 @@
+/**************************************************************************************
+ * Copyright 2013 TheSystemIdeas, Inc and Contributors. All rights reserved.          *
+ *                                                                                    *
+ *     https://github.com/owlab/fresto                                                *
+ *                                                                                    *
+ *                                                                                    *
+ * ---------------------------------------------------------------------------------- *
+ * This file is licensed under the Apache License, Version 2.0 (the "License");       *
+ * you may not use this file except in compliance with the License.                   *
+ * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 * 
+ **************************************************************************************/
 package com.fresto.noti;
 
 import java.text.MessageFormat;
@@ -17,6 +28,7 @@ import com.espertech.esper.client.EPAdministrator;
 import com.espertech.esper.client.EPServiceProvider;
 import com.espertech.esper.client.EPServiceProviderManager;
 import com.espertech.esper.client.EPStatement;
+import com.fresto.noti.subs.Subscriber;
 import com.fresto.noti.subs.SubscriberDescriptor;
 
 public class NotificationService {
@@ -32,9 +44,12 @@ public class NotificationService {
 		return instance;
 	}
 	
+	// property keys
 	private static final String NOTIFICATIONS = "notifications"; //$NON-NLS-1$
 	private static final String EPL = "{0}.epl"; //$NON-NLS-1$
 	private static final String SUBSCRIBERS = "{0}.subscribers"; //$NON-NLS-1$
+	private static final String SUBJECT = "{0}.subject"; //$NON-NLS-1$
+	private static final String SUBJECT_SUB = "{0}.subject.{1}"; //$NON-NLS-1$
 	private static final String MESSAGE = "{0}.message"; //$NON-NLS-1$
 	private static final String MESSAGE_SUB = "{0}.message.{1}"; //$NON-NLS-1$
 	private static final String CLASS = "{0}.class"; //$NON-NLS-1$
@@ -63,11 +78,13 @@ public class NotificationService {
 		String[] notifications = configuration.getStringArray(NOTIFICATIONS);
 		for (String notification : notifications) {
 			String eplKey = MessageFormat.format(EPL, notification);
-			String subKey = MessageFormat.format(SUBSCRIBERS, notification);
+			String subsKey = MessageFormat.format(SUBSCRIBERS, notification);
+			String subjKey = MessageFormat.format(SUBJECT, notification);
 			String msgKey = MessageFormat.format(MESSAGE, notification);
 
 			String epl = configuration.getString(eplKey);
-			String[] subscribers = configuration.getStringArray(subKey);
+			String[] subscribers = configuration.getStringArray(subsKey);
+			String subject = configuration.getString(subjKey);
 			String message = configuration.getString(msgKey);
 			
 			List<String> subList = new ArrayList<>();
@@ -76,10 +93,15 @@ public class NotificationService {
 				String className = configuration.getString(classKey);
 				
 				subList.add(subscriber);
-				
+
+				// noti.subject.sub
+				String subjSubKey = MessageFormat.format(SUBJECT_SUB, notification, subscriber);
+				if (configuration.containsKey(subjSubKey)) {
+					subject = configuration.getString(subjSubKey);
+				}
 				// noti.message.sub
-				if (message == null || message.equals("")) { //$NON-NLS-1$
-					String msgSubKey = MessageFormat.format(MESSAGE_SUB, notification, subscriber);
+				String msgSubKey = MessageFormat.format(MESSAGE_SUB, notification, subscriber);
+				if (configuration.containsKey(msgSubKey)) {
 					message = configuration.getString(msgSubKey);
 				}
 				
@@ -87,15 +109,15 @@ public class NotificationService {
 					Class<?> clazz = ClassLoader.getSystemClassLoader().loadClass(className);
 					SubscriberDescriptor descriptor = new SubscriberDescriptor(clazz);
 					
-					descriptor.addParam("subject", message); //$NON-NLS-1$
-					descriptor.addParam("message", message); //$NON-NLS-1$
+					descriptor.addParam(Subscriber.SUBJECT, subject);
+					descriptor.addParam(Subscriber.MESSAGE, message);
 					
 					Iterator<String> keys = configuration.getKeys(subscriber);
 					while (keys.hasNext()) {
 						String key = keys.next();
 						String value = configuration.getString(key);
 						
-						logger.info("key=" + key + ", value=" + value);
+						logger.info(key + " = " + value);
 
 						// remove subscriber name
 						key = key.substring(key.indexOf('.') + 1);

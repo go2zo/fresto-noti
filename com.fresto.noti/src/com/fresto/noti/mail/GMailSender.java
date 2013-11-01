@@ -1,9 +1,18 @@
+/**************************************************************************************
+ * Copyright 2013 TheSystemIdeas, Inc and Contributors. All rights reserved.          *
+ *                                                                                    *
+ *     https://github.com/owlab/fresto                                                *
+ *                                                                                    *
+ *                                                                                    *
+ * ---------------------------------------------------------------------------------- *
+ * This file is licensed under the Apache License, Version 2.0 (the "License");       *
+ * you may not use this file except in compliance with the License.                   *
+ * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 * 
+ **************************************************************************************/
 package com.fresto.noti.mail;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Properties;
@@ -23,9 +32,7 @@ public class GMailSender {
 			String recipients, String subject, String content){
 
 		try{
-			URL url = ClassLoader.getSystemResource("gmail.config.properties");
-			File file = new File(url.getFile());
-			InputStream inStream = new FileInputStream(file);
+			InputStream inStream = new FileInputStream("gmail.properties");
 
 			Properties props = new Properties();
 			props.load(inStream);
@@ -61,7 +68,7 @@ public class GMailSender {
 		} catch ( MessagingException ex ) {
 			System.out.println("mail send error : " + ex.getMessage());
 		} catch ( Exception e ) {
-			System.out.println("error : " + e.getMessage());
+			e.printStackTrace();
 		}
 
 	}
