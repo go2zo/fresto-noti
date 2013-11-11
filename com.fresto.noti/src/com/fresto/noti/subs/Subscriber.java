@@ -14,8 +14,11 @@ package com.fresto.noti.subs;
 import java.util.Map;
 
 public interface Subscriber {
+	static final String TYPE_MAIL = "mail"; //$NON-NLS-1$
+	static final String TYPE_JS = "js"; //$NON-NLS-1$
+	
 	static final String SUBJECT = "subject"; //$NON-NLS-1$
-	static final String MESSAGE = "message"; //$NON-NLS-1$
+	static final String CONTENT = "message"; //$NON-NLS-1$
 	
 	void setIdentifier(String id);
 	void putParams(Map<?, ?> params);

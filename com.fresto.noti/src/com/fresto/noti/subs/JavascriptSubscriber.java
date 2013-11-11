@@ -28,7 +28,7 @@ public class JavascriptSubscriber implements Subscriber {
 	}
 	
 	public void update(Object[] row) {
-		String message = (String)params.get(MESSAGE);
+		String message = (String)params.get(CONTENT);
 		message = MessageFormat.format(message, row);
 		
 	}

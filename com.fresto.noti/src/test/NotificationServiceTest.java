@@ -37,6 +37,7 @@ public class NotificationServiceTest {
 		
 		data.setDataUnit(dataUnit);
 
+		int i = 0;
 		while(true) {
 			try {
 				byte[] eventBytes = serializer.serialize(data);
@@ -44,7 +45,9 @@ public class NotificationServiceTest {
 				publisher.send(eventBytes, 0);
 
 				System.out.println("send: [" + notiTopic + ", " + data + "]");
-
+				if (i++ == 1) {
+					break;
+				}
 				Thread.sleep(1000);
 			} catch(TException te) {
 				te.printStackTrace();
