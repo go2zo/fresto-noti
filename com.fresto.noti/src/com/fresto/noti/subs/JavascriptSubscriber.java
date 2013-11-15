@@ -12,24 +12,12 @@
 package com.fresto.noti.subs;
 
 import java.text.MessageFormat;
-import java.util.Map;
 
-public class JavascriptSubscriber implements Subscriber {
+public class JavascriptSubscriber extends SubscriberImpl {
 	
-	private Map<?, ?> params;
-	
-	@Override
-	public void setIdentifier(String id) {
-	}
-
-	@Override
-	public void putParams(Map<?, ?> params) {
-		this.params = params;
-	}
-	
-	public void update(Object[] row) {
+	public void update(Object[] rows) {
 		String message = (String)params.get(CONTENT);
-		message = MessageFormat.format(message, row);
+		message = MessageFormat.format(message, rows);
 		
 	}
 	

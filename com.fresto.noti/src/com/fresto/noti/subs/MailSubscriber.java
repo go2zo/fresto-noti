@@ -15,7 +15,6 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +30,7 @@ import com.fresto.noti.mail.internal.VelocityMailTemplateManager;
 import com.fresto.noti.mail.service.MailManager;
 import com.fresto.noti.mail.service.MailTemplateManager;
 
-public class MailSubscriber implements Subscriber, MailManager {
+public class MailSubscriber extends SubscriberImpl implements MailManager {
 	
 	private Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -43,17 +42,7 @@ public class MailSubscriber implements Subscriber, MailManager {
 	
 	private String daemonName;
 	
-	private Map<?, ?> params;
-	
-	@Override
-	public void setIdentifier(String id) {
-	} 
-	@Override
-	public void putParams(Map<?, ?> params) {
-		this.params = params;
-	}
-	
-	public void update(Object[] row) {
+	public void update(Object[] rows) {
 		daemonName = (String)params.get(PROVIDER);
 
 		MailManager mailManager = new MailManagerWrapper(this);
@@ -77,6 +66,7 @@ public class MailSubscriber implements Subscriber, MailManager {
 				try {
 					subject = mailTemplateManager.getSubject(mail);
 					content = mailTemplateManager.getContent(mail);
+					content = MessageFormat.format(content, rows); // TODO
 
 					mail.setStatusCode(MailStatusCode.SEND_READY);
 					// send
@@ -110,9 +100,6 @@ public class MailSubscriber implements Subscriber, MailManager {
 		String to = (String)params.get(TO);
 		String subject = (String)params.get(SUBJECT);
 		String content = (String)params.get(CONTENT);
-		
-		logger.debug(MessageFormat.format("\r\nProvider:{0}\r\nFrom:{1}\r\nTo:{2}\r\nSubject:{3}\r\nContent:{4}",
-				daemonName, from, to, subject, content));
 		
 		Mail mail = new Mail();
 		mail.setSender(from);

@@ -1,0 +1,1 @@
+SELECT resourceId.url, avg(elapsedTime) from ResponseEdge.win:time_batch (30 sec) GROUP BY resourceId.url HAVING avg(elapsedTime) > 100

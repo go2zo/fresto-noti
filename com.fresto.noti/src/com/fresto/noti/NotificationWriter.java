@@ -11,6 +11,9 @@
  **************************************************************************************/
 package com.fresto.noti;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+
 import org.apache.thrift.TDeserializer;
 import org.apache.thrift.TException;
 import org.apache.thrift.protocol.TBinaryProtocol;
@@ -18,26 +21,36 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zeromq.ZMQ;
 
+import com.fresto.core.Topics;
+
 import fresto.command.CommandEvent;
+import fresto.data.DataUnit;
 import fresto.data.FrestoData;
 
-public class NotificationWriter extends Thread {
+public class NotificationWriter extends Thread implements Topics {
 	
 	private static Logger logger = LoggerFactory.getLogger(NotificationWriter.class);
 	
-	private static String ZMQ_URL = "tcp://*:7012";
+	private static String ZMQ_URL = "tcp://localhost:7001";
 	
 	private static final String TARGET_MODULE = "noti";
 	private static final String COMMAND_EXIT = "exit";
-	
-	private static final String TOPIC_COMMAND_EVENT = "CMD";
-	private static final String TOPIC_NOTIFICATION = "NTF";
 	
 	private static boolean work = true;
 	private static boolean sleepOn = false;
 	private static long SLEEP_TIME = 100;
 	
 	private TDeserializer deserializer;
+	
+	private String address; 
+	
+	public NotificationWriter() {
+		this(ZMQ_URL);
+	}
+	
+	public NotificationWriter(String addr) {
+		this.address = addr;
+	}
 	
 	public void run() {
 		
@@ -50,7 +63,7 @@ public class NotificationWriter extends Thread {
 			@Override
 			public void run() {
 				ZMQ.Socket puller = context.socket(ZMQ.SUB);
-				puller.connect(ZMQ_URL);
+				puller.connect(address);
 				puller.subscribe("".getBytes());
 				
 				frestoEventQueue.setPullerSocket(puller);
@@ -75,14 +88,14 @@ public class NotificationWriter extends Thread {
 									writeNotificationData(frestoEvent.getTopic(), frestoEvent.getEventBytes());
 								}
 							}
-							logger.info(queueSize + " events processed.");
+							logger.debug(queueSize + " events processed.");
 						} else {
-//							logger.info(queueSize + " events.");
+							logger.debug(queueSize + " events.");
 						}
 
 					}
 				} catch (TException e) {
-					logger.warn("Exception occurred: " + e.getMessage());
+					logger.warn("Exception occurred: " + e.getMessage(), e);
 				} catch (InterruptedException e) {
 				}
 				
@@ -94,7 +107,7 @@ public class NotificationWriter extends Thread {
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 			@Override
 			public void run() {
-				System.out.println("Interrupt received, killing server");
+				logger.info("Interrupt received, killing server");
 				// To break while clause
 				frestoEventQueue.stopWork();
 				work = false;
@@ -118,7 +131,7 @@ public class NotificationWriter extends Thread {
 		if (event.target_module.equalsIgnoreCase(TARGET_MODULE)) {
 			if (event.command.equalsIgnoreCase(COMMAND_EXIT)) {
 				work = false;
-				logger.info("Perform command: " + event.command); 
+				logger.debug("Perform command: " + event.command); 
 			} else {
 				logger.warn("Unsupported command: " + event.command);
 			}
@@ -126,14 +139,39 @@ public class NotificationWriter extends Thread {
 	}
 	
 	private void writeNotificationData(String topic, byte[] eventBytes) throws TException {
-		if(TOPIC_NOTIFICATION.equals(topic)) {
+		if (	/*TOPIC_REQUEST.equals(topic) ||*/
+				TOPIC_RESPONSE.equals(topic) ||
+				/*TOPIC_ENTRY_CALL.equals(topic) ||*/
+				TOPIC_ENTRY_RETURN.equals(topic) ||
+				/*TOPIC_OPERATION_CALL.equals(topic) ||*/
+				TOPIC_OPERATION_RETURN.equals(topic) ||
+				/*TOPIC_SQL_CALL.equals(topic) ||*/
+				TOPIC_SQL_RETURN.equals(topic)) {
 			FrestoData frestoData = new FrestoData();
 			deserializer.deserialize(frestoData, eventBytes);
+//			NotificationService.getInstance().sendEvent(frestoData);
 			
-			NotificationService.getInstance().sendEvent(frestoData);
+			DataUnit dataUnit = frestoData.getDataUnit();
+			Object fieldValue = dataUnit.getFieldValue();
+			NotificationService.getInstance().sendEvent(fieldValue);
+			
 		} else {
-			logger.warn("Event topic: " + topic + " not recognized. Possible valures: " + TOPIC_NOTIFICATION); 
+//			logger.warn("Event topic: " + topic + " not recognized."); 
 		}
 	}
 	
+	
+	public static void main(String[] args) {
+		if (args.length > 0) {
+			try {
+				URI uri = new URI(args[0]);
+				NotificationService.getInstance();
+				new NotificationWriter(uri.toString()).start();
+			} catch (URISyntaxException e) {
+				logger.error("Wrong parameter : " + args[0]);
+			}
+		} else {
+			new NotificationWriter().start();
+		}
+	}
 }

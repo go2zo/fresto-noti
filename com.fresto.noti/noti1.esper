@@ -1,0 +1,1 @@
+SELECT count(*) FROM ResponseEdge.win:time_batch(30 sec)

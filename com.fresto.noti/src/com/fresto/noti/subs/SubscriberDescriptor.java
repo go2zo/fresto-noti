@@ -66,4 +66,15 @@ public class SubscriberDescriptor {
 	public void addParam(String key, String value) {
 		params.put(key, value);
 	}
+	
+	@Override
+	public String toString() {
+		StringBuffer sb = new StringBuffer();
+		sb.append(getClass().getSimpleName()).append("{");
+		sb.append("class=").append(clazz);
+		sb.append(", id=").append(id);
+		sb.append(", params=").append(params.toString());
+		sb.append("}");
+		return sb.toString();
+	}
 }

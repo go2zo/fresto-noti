@@ -18,6 +18,9 @@ public class SubscriberFactory {
 		if (Subscriber.TYPE_JS.equalsIgnoreCase(type)) {
 			return new JavascriptSubscriber();
 		}
+		if (Subscriber.TYPE_CONSOLE.equalsIgnoreCase(type)) {
+			return new ConsoleSubscriber();
+		}
 		return null;
 	}
 }

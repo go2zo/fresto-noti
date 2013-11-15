@@ -12,6 +12,9 @@
 package com.fresto.noti;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.text.MessageFormat;
@@ -23,6 +26,7 @@ import java.util.Map;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,6 +58,7 @@ public class NotificationService {
 	private static final String NOTIFICATIONS = "notifications"; //$NON-NLS-1$
 	private static final String NOTIFICATION_PREFIX = "notification."; //$NON-NLS-1$
 	private static final String NOTIFICATION_EPL = NOTIFICATION_PREFIX + "{0}.epl"; //$NON-NLS-1$
+	private static final String NOTIFICATION_EPL_FILE = NOTIFICATION_PREFIX + "{0}.eplfile"; //$NON-NLS-1$
 	private static final String NOTIFICATION_SUBSCRIBERS = NOTIFICATION_PREFIX + "{0}.subscribers"; //$NON-NLS-1$
 	private static final String NOTIFICATION_SUBJECT = NOTIFICATION_PREFIX + "{0}.subject"; //$NON-NLS-1$
 	private static final String NOTIFICATION_SUBJECT_SUB = NOTIFICATION_PREFIX + "{0}.subject.{1}"; //$NON-NLS-1$
@@ -67,7 +72,7 @@ public class NotificationService {
 	
 	private EPServiceProvider epService;
 	
-	private Map<String, List<String>> subscriberMap;
+	private List<Notification> notificationList;
 	private Map<String, SubscriberDescriptor> subscriberDescriptors;
 	
 	private NotificationService() {
@@ -79,7 +84,7 @@ public class NotificationService {
 	 * 'notification.properties'을 파싱하여 SubscriberDescriptor 생성
 	 */
 	private void init() {
-		subscriberMap = new HashMap<>();
+		notificationList = new ArrayList<>();
 		subscriberDescriptors = new HashMap<>();
 
 		PropertiesConfiguration configuration = null;
@@ -90,27 +95,36 @@ public class NotificationService {
 		}
 
 		// notifications=noti1, noti2, ...
-		String[] notifications = configuration.getStringArray(NOTIFICATIONS);
-		for (String notification : notifications) {
+		String[] notiNames = configuration.getStringArray(NOTIFICATIONS);
+		for (String notiName : notiNames) {
 			// notification.noti1.epl
-			String epl = configuration.getString( MessageFormat.format(NOTIFICATION_EPL, notification) );
+			String epl = configuration.getString( MessageFormat.format(NOTIFICATION_EPL, notiName) );
+			// notification.noti1.eplfile
+			String eplFileName = configuration.getString( MessageFormat.format(NOTIFICATION_EPL_FILE, notiName) );
 			// notification.noti1.subscribers=mail1, js1, ...
-			String[] subscribers = configuration.getStringArray( MessageFormat.format(NOTIFICATION_SUBSCRIBERS, notification) );
+			String[] subscriberNames = configuration.getStringArray( MessageFormat.format(NOTIFICATION_SUBSCRIBERS, notiName) );
 			// notification.noti1.subject
-			String subject = configuration.getString( MessageFormat.format(NOTIFICATION_SUBJECT, notification) );
+			String subject = configuration.getString( MessageFormat.format(NOTIFICATION_SUBJECT, notiName) );
 			// notification.noti1.content
-			String content = configuration.getString( MessageFormat.format(NOTIFICATION_CONTENT, notification) );
+			String content = configuration.getString( MessageFormat.format(NOTIFICATION_CONTENT, notiName) );
+
+			// notification.noti1.eplfile
+			if (StringUtils.isBlank(epl) && StringUtils.isNotBlank(eplFileName)) {
+				epl = loadFile(eplFileName);
+				logger.info("EPL loaded from text file : \"" + epl + "\"");
+			}
+
+			Notification notification = new Notification(epl);
 			
-			List<String> subList = new ArrayList<>();
-			for (String subscriber : subscribers) {
+			for (String subscriberName : subscriberNames) {
 				// subscriber.mail1.type=[mail | js | user]
-				String type = configuration.getString( MessageFormat.format(SUBSCRIBER_TYPE, subscriber) );
+				String type = configuration.getString( MessageFormat.format(SUBSCRIBER_TYPE, subscriberName) );
 				SubscriberDescriptor descriptor = new SubscriberDescriptor(type);
 				
 				if (Subscriber.TYPE_MAIL.equalsIgnoreCase(type) == false &&
 						Subscriber.TYPE_JS.equals(type) == false) {
 					// subscriber.user1.class
-					String className = configuration.getString( MessageFormat.format(SUBSCRIBER_CLASS, subscriber) );
+					String className = configuration.getString( MessageFormat.format(SUBSCRIBER_CLASS, subscriberName) );
 					if (className != null && !className.equals("")) {
 						try {
 							Class<?> clazz = ClassLoader.getSystemClassLoader().loadClass(className);
@@ -121,15 +135,15 @@ public class NotificationService {
 					}
 				}
 				
-				subList.add(subscriber);
+				notification.addSubscriber(subscriberName);
 
 				// notification.noti1.subject.mail1
-				String subjectSubKey = MessageFormat.format(NOTIFICATION_SUBJECT_SUB, notification, subscriber);
+				String subjectSubKey = MessageFormat.format(NOTIFICATION_SUBJECT_SUB, notiName, subscriberName);
 				if (configuration.containsKey(subjectSubKey)) {
 					subject = configuration.getString(subjectSubKey);
 				}
 				// notification.noti1.content.mail1
-				String contentSubKey = MessageFormat.format(NOTIFICATION_CONTENT_SUB, notification, subscriber);
+				String contentSubKey = MessageFormat.format(NOTIFICATION_CONTENT_SUB, notiName, subscriberName);
 				if (configuration.containsKey(contentSubKey)) {
 					content = configuration.getString(contentSubKey);
 				}
@@ -137,7 +151,7 @@ public class NotificationService {
 				descriptor.addParam(Subscriber.SUBJECT, subject);
 				descriptor.addParam(Subscriber.CONTENT, content);
 
-				String subscriberPrefix = MessageFormat.format(SUBSCRIBER, subscriber);
+				String subscriberPrefix = MessageFormat.format(SUBSCRIBER, subscriberName);
 				Iterator<String> keys = configuration.getKeys(subscriberPrefix);
 				while (keys.hasNext()) {
 					String key = keys.next();
@@ -160,12 +174,12 @@ public class NotificationService {
 				}
 
 				// ???
-				descriptor.setIdentifier(subscriber);
+				descriptor.setIdentifier(subscriberName);
 				
-				subscriberDescriptors.put(subscriber, descriptor);
+				subscriberDescriptors.put(subscriberName, descriptor);
 			}
 			
-			subscriberMap.put(epl, subList);
+			notificationList.add(notification);
 		}
 	}
 	
@@ -179,23 +193,25 @@ public class NotificationService {
 		epService = EPServiceProviderManager.getDefaultProvider(config);
 		EPAdministrator epAdmin = epService.getEPAdministrator();
 
-		Iterator<String> iter = subscriberMap.keySet().iterator();
+		Iterator<Notification> iter = notificationList.iterator();
 		while (iter.hasNext()) {
-			String epl = iter.next();
-			List<String> subNames = subscriberMap.get(epl);
+			Notification noti = iter.next();
+			final String epl = noti.getEpl();
+			List<String> subscriberNames = noti.getSubscribers();
 			
-			for (String subName : subNames) {
-				SubscriberDescriptor descriptor = subscriberDescriptors.get(subName);
+			for (String subscriberName : subscriberNames) {
+				SubscriberDescriptor descriptor = subscriberDescriptors.get(subscriberName);
 				try {
 					Object newInstance = descriptor.getSubscriber();
 					EPStatement statement = epAdmin.createEPL(epl);
 					statement.setSubscriber(newInstance);
+					logger.info("Create EPL : epl=" + epl + ", subscriber=" + newInstance);
 				} catch (InstantiationException e) {
 					logger.warn(e.getMessage());
 				} catch (IllegalAccessException e) {
 					logger.warn(e.getMessage());
 				} catch (NullPointerException e) {
-					logger.warn(e.getMessage());
+					logger.warn("Can't create epl : " + epl, e);
 				}
 			}
 		}
@@ -207,6 +223,25 @@ public class NotificationService {
 		} catch (NullPointerException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	private FileReader reader;
+	
+	private String loadFile(String fileName) {
+		StringBuffer sb = new StringBuffer();
+		File file = new File(fileName);
+		try {
+			reader = new FileReader(file);
+			char[] buf = new char[1024];
+			while (reader.read(buf) > 0) {
+				sb.append(buf);
+			}
+		} catch (FileNotFoundException e) {
+			logger.warn("File not found.", e);
+		} catch (IOException e) {
+			logger.warn("File cannot read.", e);
+		}
+		return sb.toString().trim();
 	}
 	
 	class KRPropertiesConfiguration extends PropertiesConfiguration {
@@ -230,7 +265,7 @@ public class NotificationService {
 		@Override
 		public String getString(String key, String defaultValue) {
 			String value = super.getString(key, defaultValue);
-			return convertToUtf8(value);
+			return value == null ? null : convertToUtf8(value);
 		}
 
 		@Override

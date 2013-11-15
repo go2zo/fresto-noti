@@ -28,7 +28,6 @@ public class NotificationServiceTest {
 		Pedigree pedigree = new Pedigree(500);
 		data.setPedigree(pedigree);
 
-		ResourceID.url("http://www.aaa.com");
 		ResponseEdge edge = new ResponseEdge(
 				ResourceID.url("http://www.aaa.com"),
 				ClientID.clientIp("127.0.0.1"),
