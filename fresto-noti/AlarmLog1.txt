@@ -1,6 +1,0 @@
-120.5 http://beta.owlab.com:8080/jpetstoreL/shop/viewCategory.do?categoryId=FISH 2013-09-15 18:22:45
-117.0 http://beta.owlab.com:8080/jpetstoreL/shop/viewCategory.do?categoryId=CATS 2013-09-15 18:25:29
-117.0 http://beta.owlab.com:8080/jpetstoreL/shop/viewCategory.do?categoryId=FISH 2013-09-15 18:25:29
-122.0 http://beta.owlab.com:8080/jpetstoreL/shop/viewCategory.do?categoryId=CATS 2013-09-15 18:29:25
-111.0 http://beta.owlab.com:8080/jpetstoreL/shop/viewCategory.do?categoryId=DOGS 2013-09-15 18:29:25
-137.0 http://beta.owlab.com:8080/jpetstoreL/shop/viewCategory.do?categoryId=DOGS 2013-09-15 18:37:51
