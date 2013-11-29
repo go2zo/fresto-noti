@@ -1,6 +1,3 @@
-[submodule "com.fresto.noti/fresto-events"]
-	path = com.fresto.noti/fresto-events
-	url = https://github.com/owlab/fresto-events.git
-[submodule "fresto_event"]
-	path = fresto_event
+[submodule "fresto-events"]
+	path = fresto-events
 	url = https://github.com/owlab/fresto-events.git

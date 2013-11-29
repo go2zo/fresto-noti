@@ -1,3 +1,3 @@
 fresto-notice
 =============
-This is to maintain an implementation of monitoring alarm and notification based on fresto platform.
+This is to provide an exmaple implementation of alarm and notification functions based on raw performance events.
